@@ -1,24 +1,28 @@
-const connect = require('connect');
-const app = connect();
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import bodyParser from "body-parser";
 
-function logger(req, res, next) {
-    console.log(req.method, req.url);
+const app = express();
+const PORT = 3000;
 
-    next();
- };
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-function helloWorld(req, res, next) {
-   res.setHeader('Content-Type', 'text/plain');
-   res.end('Hello World');
-};
 
-function GoodbyeWorld(req, res, next) {
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Goodbye World');
- };
+mongoose.connect("mongodb+srv://ssavy_db_user:Monetrack18112006@cluster0.henraqv.mongodb.net/?appName=Cluster0", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log("DB Connection Error:", err));
 
- app.use(logger);
-app.use('/hello',helloWorld);
-app.use('/goodbye',GoodbyeWorld);
-app.listen(3000);
-console.log('Server running at http://localhost:3000/');
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to My Portfolio application." });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});

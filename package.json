@@ -9,7 +9,11 @@
   "author": "Blessing",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^2.2.0",
     "connect": "^3.7.0",
-    "express": "^4.21.0"
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mongodb": "^6.20.0",
+    "mongoose": "^8.19.2"
   }
 }
