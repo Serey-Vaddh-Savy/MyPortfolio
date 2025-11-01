@@ -2,14 +2,25 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import bodyParser from "body-parser";
+import contactRoutes from "./server/routes/contact.routes.js";
+import projectRoutes from "./server/routes/project.routes.js";
+import qualificationRoutes from "./server/routes/qualification.routes.js";
+import userRoutes from "./server/routes/user.routes.js";
+
 
 const app = express();
 const PORT = 3000;
 
-// Middleware
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use("/api/contacts", contactRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/qualifications", qualificationRoutes);
+app.use("/api/users", userRoutes);
+
 
 
 mongoose.connect("mongodb+srv://ssavy_db_user:Monetrack18112006@cluster0.henraqv.mongodb.net/?appName=Cluster0", {
@@ -26,3 +37,5 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+
