@@ -1,20 +1,18 @@
-import express from "express";
-import {
-  createUser,
-  getUsers,
-  getUserById,
-  updateUser,
-  deleteUser,
-  deleteAllUsers
-} from "../controllers/user.controller.js";
+import express from "express"
+import * as userCtrl from '../controllers/user.controller.js'
+import authCtrl from '../controllers/auth.controller.js'
 
-const router = express.Router();
+const router = express.Router()
 
-router.get("/", getUsers);
-router.get("/:id", getUserById);
-router.post("/", createUser);
-router.put("/:id", updateUser);
-router.delete("/:id", deleteUser);
-router.delete("/", deleteAllUsers);
+router.route("/api/users")
+  .get(userCtrl.list)
+  .post(userCtrl.create)
 
-export default router;
+router.route("/api/users/:userId")
+  .get(authCtrl.requireSignin, userCtrl.read)
+  .put(authCtrl.requireSignin, authCtrl.hasAuthorization, userCtrl.update)
+  .delete(authCtrl.requireSignin, authCtrl.hasAuthorization, userCtrl.remove)
+
+router.param("userId", userCtrl.userByID)
+
+export default router

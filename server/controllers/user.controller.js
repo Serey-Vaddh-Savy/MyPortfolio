@@ -1,58 +1,78 @@
 import User from "../models/user.model.js";
 
-export const createUser = async (req, res) => {
+export const create = async (req, res) => {
+  const user = new User(req.body);
   try {
-    const data = new User(req.body);
-    await data.save();
-    res.status(201).json(data);
+    await user.save();
+    return res.status(200).json({
+      message: "Successfully created"
+    });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    return res.status(400).json({
+      message: err.message
+    });
   }
 };
 
-export const getUsers = async (req, res) => {
+export const list = async (req, res) => {
   try {
-    const data = await User.find();
-    res.json(data);
+    let users = await User.find().select("name email created updated");
+    res.json(users);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(400).json({
+      message: err.message
+    });
   }
 };
 
-export const getUserById = async (req, res) => {
+export const read = (req, res) => {
+  req.profile.hashed_password = undefined;
+  req.profile.salt = undefined;
+  return res.json(req.profile);
+};
+
+export const update = async (req, res) => {
   try {
-    const data = await User.findById(req.params.id);
-    if (!data) return res.status(404).json({ message: "User not found" });
-    res.json(data);
+    let user = req.profile;
+    user = Object.assign(user, req.body);
+    user.updated = Date.now();
+    await user.save();
+    user.hashed_password = undefined;
+    user.salt = undefined;
+    res.json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(400).json({
+      message: err.message
+    });
   }
 };
 
-export const updateUser = async (req, res) => {
+export const remove = async (req, res) => {
   try {
-    const data = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!data) return res.status(404).json({ message: "User not found" });
-    res.json(data);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
-
-export const deleteUser = async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.params.id);
+    let user = req.profile;
+    await user.deleteOne();
+    user.hashed_password = undefined;
+    user.salt = undefined;
     res.json({ message: "User deleted" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(400).json({
+      message: err.message
+    });
   }
 };
 
-export const deleteAllUsers = async (req, res) => {
+export const userByID = async (req, res, next, id) => {
   try {
-    await User.deleteMany();
-    res.json({ message: "All users deleted" });
+    let user = await User.findById(id);
+    if (!user)
+      return res.status(400).json({
+        message: "User not found"
+      });
+    req.profile = user;
+    next();
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(400).json({
+      message: "Could not retrieve user"
+    });
   }
 };
