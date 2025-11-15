@@ -2,19 +2,17 @@ import express from "express";
 import {
   createProject,
   getProjects,
-  getProjectById,
   updateProject,
-  deleteProject,
-  deleteAllProjects
+  deleteProject
 } from "../controllers/project.controller.js";
+
+import { requireAuth, requireAdmin } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 router.get("/", getProjects);
-router.get("/:id", getProjectById);
-router.post("/", createProject);
-router.put("/:id", updateProject);
-router.delete("/:id", deleteProject);
-router.delete("/", deleteAllProjects);
+router.post("/", requireAuth, requireAdmin, createProject);
+router.put("/:id", requireAuth, requireAdmin, updateProject);
+router.delete("/:id", requireAuth, requireAdmin, deleteProject);
 
 export default router;

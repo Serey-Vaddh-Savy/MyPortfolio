@@ -2,19 +2,17 @@ import express from "express";
 import {
   createContact,
   getContacts,
-  getContactById,
   updateContact,
-  deleteContact,
-  deleteAllContacts
+  deleteContact
 } from "../controllers/contact.controller.js";
+
+import { requireAuth, requireAdmin } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 router.get("/", getContacts);
-router.get("/:id", getContactById);
-router.post("/", createContact);
-router.put("/:id", updateContact);
-router.delete("/:id", deleteContact);
-router.delete("/", deleteAllContacts);
+router.post("/", requireAuth, requireAdmin, createContact);
+router.put("/:id", requireAuth, requireAdmin, updateContact);
+router.delete("/:id", requireAuth, requireAdmin, deleteContact);
 
 export default router;
