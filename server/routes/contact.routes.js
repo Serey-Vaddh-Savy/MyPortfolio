@@ -10,8 +10,11 @@ import { requireAuth, requireAdmin } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", getContacts);
-router.post("/", requireAuth, requireAdmin, createContact);
+// PUBLIC
+router.post("/", createContact);
+
+// ADMIN ONLY
+router.get("/", requireAuth, requireAdmin, getContacts);
 router.put("/:id", requireAuth, requireAdmin, updateContact);
 router.delete("/:id", requireAuth, requireAdmin, deleteContact);
 
