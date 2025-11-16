@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import config from "../../config/config.js";
 
-// ------------------ SIGN UP ------------------
 export const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -18,17 +17,16 @@ export const signup = async (req, res) => {
     const user = await User.create({
       name,
       email,
-      password: hashedPass
+      password: hashedPass,
+      role: "user"
     });
 
     return res.json({ message: "Signup successful", user });
   } catch (err) {
-    console.error(err);
     return res.status(500).json({ error: "Signup failed" });
   }
 };
 
-// ------------------ SIGN IN ------------------
 export const signin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -37,12 +35,23 @@ export const signin = async (req, res) => {
     if (!user)
       return res.status(400).json({ error: "User not found" });
 
-    const match = await bcrypt.compare(password, user.password);
+    let match = false;
+
+    // 🟢 ADMIN — plain text
+    if (user.role === "admin") {
+      match = password === user.password;
+    }
+
+    // 🔵 NORMAL USER — bcrypt check
+    else {
+      match = await bcrypt.compare(password, user.password);
+    }
+
     if (!match)
       return res.status(401).json({ error: "Email and password do not match." });
 
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { id: user._id, email: user.email, role: user.role },
       config.jwtSecret,
       { expiresIn: "1d" }
     );
@@ -51,15 +60,18 @@ export const signin = async (req, res) => {
       token,
       id: user._id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      role: user.role
     });
+
   } catch (err) {
-    console.error(err);
     return res.status(500).json({ error: "Could not sign in" });
   }
 };
 
-// ------------------ SIGN OUT ------------------
+console.log("Loaded secret:", config.jwtSecret);
+
+
 export const signout = (req, res) => {
   return res.json({ message: "Signed out" });
 };

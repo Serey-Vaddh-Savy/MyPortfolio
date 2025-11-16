@@ -1,3 +1,4 @@
+// server/middleware/auth.middleware.js
 import jwt from "jsonwebtoken";
 
 export const requireAuth = (req, res, next) => {
@@ -9,9 +10,14 @@ export const requireAuth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    console.log("🔥 Token received:", token);
+    console.log("🔥 Decoded token:", decoded);
+
     req.user = decoded;
     next();
   } catch (err) {
+    console.log("❌ JWT ERROR:", err.message);
     return res.status(401).json({ message: "Invalid token." });
   }
 };

@@ -1,12 +1,25 @@
 import mongoose from "mongoose";
 
-const projectSchema = new mongoose.Schema({
-  title: String,
-  firstname: String,
-  lastname: String,
-  email: String,
-  completion: Date,
-  description: String
-});
+const ProjectSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true
+    },
+    description: {
+      type: String,
+      default: ""
+    },
+    link: {
+      type: String,
+      default: ""
+    },
+    info: {
+      type: String,
+      default: ""
+    }
+  },
+  { timestamps: true }
+);
 
-export default mongoose.model("Project", projectSchema);
+export default mongoose.model("Project", ProjectSchema);
